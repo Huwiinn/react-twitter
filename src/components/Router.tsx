@@ -5,10 +5,10 @@ import PostEditPage from "pages/posts/edit/[id]";
 import PostDetailPage from "pages/posts/[id]";
 import ProfilePage from "pages/profile/index";
 import SearchPage from "pages/search";
-import LoginPage from "pages/users/login";
-import SignupPage from "pages/users/signup";
 import NotificationPage from "pages/notification";
 import ProfileEditPage from "pages/profile/edit";
+import LoginPage from "pages/users/login";
+import SignupPage from "pages/users/signup";
 
 const Router = () => {
   return (
