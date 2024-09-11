@@ -1,0 +1,138 @@
+// 변수선언 $
+$font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+  "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+
+$background: #1e293b;
+$activeBackground: #88a8dd;
+$white: #fff;
+$border: #708090;
+$primaryColor: #60a5fa;
+$activeBorder: #3879c8;
+$grayText: #9ca3af;
+$danger: #dc2626;
+$danger: #992323;
+$gray: #6b7280;
+
+// 전체 레이아웃
+body {
+  margin: 0;
+  font-family: $font;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  background-color: $background;
+  color: $white;
+}
+
+.layout {
+  max-width: 600px;
+  margin: 0 auto;
+  position: relative;
+  border-left: 1px solid $border;
+  border-right: 1px solid $border;
+  min-height: 100dvh;
+}
+
+.button {
+  padding: 0.2rem 0.8rem;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 1.25rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+// home layout
+// scss는 중첩이 가능하여(상속) 간단하게 스타일링 할 수 있음.
+// & : 상위 클래스네임을 상속한다.
+.home {
+  &__title {
+    padding: 16px;
+    font-weight: 700;
+    font-size: 20px;
+  }
+
+  &__tabs {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  &__tab {
+    text-align: center;
+    font-weight: 500;
+    padding: 16px;
+    cursor: pointer;
+
+    &--active {
+      font-weight: 700;
+      border-bottom: 3px solid $activeBorder;
+    }
+
+    &:hover,
+    &:focus {
+      background-color: $activeBackground;
+    }
+  }
+}
+
+.post_form {
+  &--textarea {
+    font-family: $font;
+    min-height: 120px;
+    display: block;
+    margin: 0 auto;
+    width: calc(100% - 16px);
+    padding: 8px; // width에서 16px는
+    border: none;
+    resize: none;
+    outline: none;
+    font-size: 20px;
+    border-bottom: 1px solid $border;
+
+    &::placeholder {
+      font-family: $font;
+      color: $grayText;
+      font-size: 20px;
+    }
+  }
+
+  &--submit-area {
+    display: flex;
+    padding: 0.75rem 1rem;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid $border;
+
+    .hidden {
+      display: none; // 파일 선택되었을 때, 제거하도록 해보기. none처리 되고나서 무슨 파일 선택했는지 알 수가 없음
+    }
+  }
+
+  &--file {
+    // background-color: red;
+    display: flex;
+    padding: 8px 12px;
+    // flex-direction: column;
+    cursor: pointer;
+
+    &-icon {
+      color: $activeBorder;
+    }
+  }
+
+  &--submit-btn {
+    @extend .button;
+    padding: 0.5rem 1rem;
+    background-color: $primaryColor;
+
+    &:hover,
+    &:focus {
+      background-color: $activeBackground;
+    }
+  }
+}

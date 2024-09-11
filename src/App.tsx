@@ -2,6 +2,7 @@ import Router from "components/Router";
 import { getAuth } from "firebase/auth";
 import { app } from "firebaseApp";
 import { useState } from "react";
+import Layout from "components/Layout";
 
 function App() {
   const auth = getAuth(app);
@@ -9,7 +10,11 @@ function App() {
     !!auth?.currentUser ? true : false
   );
 
-  return <Router />;
+  return (
+    <Layout>
+      <Router />
+    </Layout>
+  );
 }
 
 export default App;
