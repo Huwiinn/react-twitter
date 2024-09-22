@@ -1,8 +1,12 @@
 import { useNavigate } from "react-router-dom";
-import { FaHome, FaUser, FaSignOutAlt } from "react-icons/fa";
+import { FaHome, FaUser, FaSignOutAlt, FaSignInAlt } from "react-icons/fa";
+import AuthContext from "context/AuthContext";
+import { useContext } from "react";
 
 const FooterMenu = () => {
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
+  console.log("user : ", user);
 
   return (
     <div className="footer">
@@ -19,12 +23,21 @@ const FooterMenu = () => {
           onClick={() => navigate("/profile")}>
           <FaUser /> Profile
         </button>
-        <button
-          type="button"
-          aria-label="Logout Button"
-          onClick={() => navigate("/")}>
-          <FaSignOutAlt /> Logout
-        </button>
+        {user === null ? (
+          <button
+            type="button"
+            aria-label="Login Button"
+            onClick={() => navigate("/users/login")}>
+            <FaSignInAlt /> Login
+          </button>
+        ) : (
+          <button
+            type="button"
+            aria-label="Logout Button"
+            onClick={() => navigate("/")}>
+            <FaSignOutAlt /> Logout
+          </button>
+        )}
       </div>
     </div>
   );
