@@ -21,10 +21,10 @@ body {
   font-family: $font;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: $background;
 }
 
 * {
-  background-color: $background;
   color: $white;
 }
 

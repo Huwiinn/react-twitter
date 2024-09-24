@@ -1,6 +1,12 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import {
+  getAuth,
+  GithubAuthProvider,
+  GoogleAuthProvider,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+} from "firebase/auth";
 import { app } from "firebaseApp"; // import 경로 확인 잘하기
 import { toast } from "react-toastify";
 
@@ -51,6 +57,35 @@ const LoginForm = () => {
     }
   };
 
+  const onClickSocialLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    try {
+      const auth = getAuth(app);
+      let provider;
+      const target = e.target as HTMLButtonElement;
+
+      if (target.name === "google") {
+        provider = new GoogleAuthProvider();
+      }
+
+      if (target.name === "github") {
+        provider = new GithubAuthProvider();
+      }
+
+      const signUpInfo = await signInWithPopup(
+        auth,
+        provider as GoogleAuthProvider | GithubAuthProvider
+      );
+
+      toast.success("로그인 되었습니다.");
+      navigate("/");
+
+      console.log("signUpInfo : ", signUpInfo);
+    } catch (error) {
+      console.log(error);
+      toast.error(`로그인에 실패하였습니다. `);
+    }
+  };
+
   return (
     <form className="form form--lg" onSubmit={onSubmit}>
       <div className="form__title">로그인</div>
@@ -95,6 +130,24 @@ const LoginForm = () => {
           className="form__btn--submit"
           disabled={(isError?.length as number) > 0}>
           로그인
+        </button>
+      </div>
+      <div className="form__block">
+        <button
+          type="button"
+          name="google"
+          className="form__btn--google"
+          onClick={onClickSocialLogin}>
+          Google로 로그인
+        </button>
+      </div>
+      <div className="form__block">
+        <button
+          type="button"
+          name="github"
+          className="form__btn--github"
+          onClick={onClickSocialLogin}>
+          Github로 로그인
         </button>
       </div>
     </form>
