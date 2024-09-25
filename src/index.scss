@@ -21,11 +21,12 @@ body {
   font-family: $font;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: $background;
+  background-color: inherit;
 }
 
 * {
   color: $white;
+  background-color: $background;
 }
 
 a {
@@ -51,6 +52,19 @@ a {
   border: none;
   cursor: pointer;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.transparent {
+  background-color: transparent;
+  backdrop-filter: blur(10px);
+}
+
+.sticky {
+  width: 100%;
+  position: sticky;
+  top: 0;
+  max-width: 600px;
+  margin: 0px;
 }
 
 // footer
@@ -89,19 +103,27 @@ a {
 // scss는 중첩이 가능하여(상속) 간단하게 스타일링 할 수 있음.
 // & : 상위 클래스네임을 상속한다.
 .home {
+  &__top {
+    @extend .transparent;
+    @extend .sticky;
+  }
+
   &__title {
+    background-color: transparent;
     padding: 16px;
     font-weight: 700;
     font-size: 20px;
   }
 
   &__tabs {
+    background-color: transparent;
     width: 100%;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   &__tab {
+    background-color: transparent;
     text-align: center;
     font-weight: 500;
     padding: 16px;

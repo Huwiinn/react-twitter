@@ -1,4 +1,5 @@
 import { initializeApp, FirebaseApp, getApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
 
 export let app: FirebaseApp; // FirebaseApp 인스턴스 타입 할당
 
@@ -25,4 +26,5 @@ try {
 // 다시 initializeApp을 호출하면 오류가 발생할 수 있다.
 const firebase = initializeApp(firebaseConfig);
 
+export const db = getFirestore(app);
 export default firebase;

@@ -68,10 +68,12 @@ const posts: PostProps[] = [
 const HomePage = () => {
   return (
     <div className="home">
-      <div className="home__title">Home</div>
-      <div className="home__tabs">
-        <div className="home__tab home__tab--active">For U</div>
-        <div className="home__tab">Following</div>
+      <div className="home__top">
+        <div className="home__title">Home</div>
+        <div className="home__tabs">
+          <div className="home__tab home__tab--active">For U</div>
+          <div className="home__tab">Following</div>
+        </div>
       </div>
 
       {/* post form */}
