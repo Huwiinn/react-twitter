@@ -1,5 +1,16 @@
 import { PostBox } from "components/posts/PostBox";
 import { PostForm } from "../../components/posts/PostForm";
+import { useContext, useState } from "react";
+import { useEffect } from "react";
+import {
+  collection,
+  query,
+  where,
+  onSnapshot,
+  orderBy,
+} from "firebase/firestore";
+import AuthContext from "context/AuthContext";
+import { db } from "firebaseApp";
 
 export interface PostProps {
   id: string;
@@ -13,59 +24,27 @@ export interface PostProps {
   comments?: any;
 }
 
-const posts: PostProps[] = [
-  {
-    id: "테스트 아이디1",
-    email: "test@gmail.com",
-    content: "오늘은 전포동에 가요~",
-    createdAt: "2024.08.07",
-    uid: "testUID",
-  },
-  {
-    id: "테스트 아이디2",
-    email: "test@gmail.com",
-    content: "오늘은 전포동에 가요~",
-    createdAt: "2024.08.07",
-    uid: "testUID",
-  },
-  {
-    id: "테스트 아이디3",
-    email: "test@gmail.com",
-    content: "오늘은 전포동에 가요~",
-    createdAt: "2024.08.07",
-    uid: "testUID",
-  },
-  {
-    id: "테스트 아이디4",
-    email: "test@gmail.com",
-    content: "오늘은 전포동에 가요~",
-    createdAt: "2024.08.07",
-    uid: "testUID",
-  },
-  {
-    id: "테스트 아이디5",
-    email: "test@gmail.com",
-    content: "오늘은 전포동에 가요~",
-    createdAt: "2024.08.07",
-    uid: "testUID",
-  },
-  {
-    id: "테스트 아이디6",
-    email: "test@gmail.com",
-    content: "오늘은 전포동에 가요~",
-    createdAt: "2024.08.07",
-    uid: "testUID",
-  },
-  {
-    id: "테스트 아이디7",
-    email: "test@gmail.com",
-    content: "오늘은 전포동에 가요~",
-    createdAt: "2024.08.07",
-    uid: "testUID",
-  },
-];
-
 const HomePage = () => {
+  const [posts, setPosts] = useState<PostProps[]>([]);
+  const { user } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (user) {
+      let postsRef = collection(db, "posts");
+      let postsQuery = query(postsRef, orderBy("createdAt", "desc"));
+
+      onSnapshot(postsQuery, (snapShot) => {
+        let dataObj = snapShot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc?.id,
+        }));
+
+        console.log("dataObj : ", dataObj);
+        setPosts(dataObj as PostProps[]);
+      });
+    }
+  }, [user]);
+
   return (
     <div className="home">
       <div className="home__top">
@@ -81,9 +60,13 @@ const HomePage = () => {
 
       {/* posts Lists */}
       <div className="post">
-        {posts?.map((post, idx) => (
-          <PostBox post={post} key={`post ${idx}`} />
-        ))}
+        {posts.length > 0 ? (
+          posts?.map((post, idx) => <PostBox post={post} key={`post ${idx}`} />)
+        ) : (
+          <div className="post__no-posts">
+            <p className="post__text">게시글이 없습니다.</p>
+          </div>
+        )}
       </div>
     </div>
   );

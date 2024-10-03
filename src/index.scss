@@ -200,6 +200,17 @@ a {
 
 // post layout
 .post {
+  &__no-posts {
+    padding: 16px;
+
+    .post__text {
+      font-size: 14px;
+      padding: 1rem;
+      border: 1px solid gray;
+      border-radius: 4px;
+    }
+  }
+
   padding-bottom: 40px;
 
   &_box--profile {

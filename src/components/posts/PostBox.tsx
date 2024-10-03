@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import { FaUserCircle, FaHeart, FaComment } from "react-icons/fa";
 import { PostProps } from "pages/home";
+import { useContext } from "react";
+import AuthContext from "context/AuthContext";
 
 type postBoxProps = {
   post: PostProps;
@@ -11,6 +13,7 @@ type postBoxProps = {
 // post: postBoxProps => post를 사용하려면 props.post로 해당 props 사용가능.
 // 즉, 타입을 지정할 때에 { post }: postBoxProps 이런식으로 설정하면 내가 받은 post props의 타입을 곧바로 명시하는 것임
 export const PostBox = ({ post }: postBoxProps) => {
+  const { user } = useContext(AuthContext);
   const handleDelete = () => {
     console.log("게시글 삭제~");
   };
@@ -35,13 +38,20 @@ export const PostBox = ({ post }: postBoxProps) => {
       </Link>
       <div className="post_box--footer">
         {/* post.uid === user.uid 일 때 */}
+        {post?.uid === user?.uid && (
+          <>
+            <button
+              type="button"
+              className="post_delete"
+              onClick={handleDelete}>
+              Delete
+            </button>
+            <button type="button" className="post_edit">
+              <Link to={`/posts/edit/${post?.id}`}>Edit</Link>
+            </button>
+          </>
+        )}
         <>
-          <button type="button" className="post_delete" onClick={handleDelete}>
-            Delete
-          </button>
-          <button type="button" className="post_edit">
-            <Link to={`/posts/edit/${post?.id}`}>Edit</Link>
-          </button>
           <button type="button" className="post_likes">
             <FaHeart />
             {post?.likeCount || 0}
