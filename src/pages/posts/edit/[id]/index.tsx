@@ -1,7 +1,7 @@
-import React from "react";
+import { PostEditForm } from "components/posts/PostEditForm";
 
 const PostEditPage = () => {
-  return <h1>게시글 수정 페이지</h1>;
+  return <PostEditForm />;
 };
 
 export default PostEditPage;

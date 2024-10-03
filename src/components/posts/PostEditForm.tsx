@@ -1,13 +1,27 @@
 import { FiImage } from "react-icons/fi";
-import { useContext, useState } from "react";
-import { collection, addDoc } from "firebase/firestore";
+import { useCallback, useEffect, useState } from "react";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
 import { db } from "firebaseApp";
-import AuthContext from "context/AuthContext";
+import { useNavigate, useParams } from "react-router-dom";
+import { PostProps } from "pages/home";
 
-export const PostForm = () => {
+export const PostEditForm = () => {
   const [isContent, setIsContent] = useState<string>("");
-  const { user } = useContext(AuthContext);
+  const [post, setPost] = useState<PostProps | null>(null);
+  const params = useParams();
+  const navigate = useNavigate();
+
+  const getPost = useCallback(async () => {
+    if (params.id) {
+      const postRef = doc(db, "posts", params.id);
+      const postSnap = await getDoc(postRef);
+
+      setPost({ ...(postSnap?.data() as PostProps), id: postRef.id });
+      setIsContent(postSnap?.data()?.content);
+    }
+  }, [params.id]);
+
   const handleFileUpload = () => {
     console.log("파일 업로드~");
   };
@@ -16,23 +30,19 @@ export const PostForm = () => {
     e.preventDefault();
 
     try {
-      await addDoc(collection(db, "posts"), {
-        content: isContent,
-        createdAt: new Date()?.toLocaleDateString("ko", {
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-        }),
-        uid: user?.uid,
-        email: user?.email,
-      });
+      if (post) {
+        const postRef = doc(db, "posts", post?.id);
 
+        await updateDoc(postRef, {
+          content: isContent,
+        });
+      }
       setIsContent("");
-
-      toast.success("게시글을 작성하였습니다.");
+      navigate(`/posts/${post?.id}`);
+      toast.success("게시글을 수정하였습니다.");
     } catch (error) {
-      console.error(`게시글 작성 실패 : ${error}`);
-      toast.error("게시글 작성에 실패했습니다.");
+      console.error(`게시글 수정 실패 : ${error}`);
+      toast.error("게시글 수정에 실패했습니다.");
     }
   };
 
@@ -45,6 +55,10 @@ export const PostForm = () => {
       setIsContent(value);
     }
   };
+
+  useEffect(() => {
+    params.id && getPost();
+  }, [getPost]);
 
   return (
     <form className="post_form" onSubmit={onSubmit}>
@@ -70,7 +84,7 @@ export const PostForm = () => {
           className="hidden"
           aria-label="이미지 업로드"
         />
-        <input type="submit" value="Tweet" className="post_form--submit-btn" />
+        <input type="submit" value="수정" className="post_form--submit-btn" />
       </div>
     </form>
   );
