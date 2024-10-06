@@ -1,5 +1,11 @@
 import { useNavigate } from "react-router-dom";
-import { FaHome, FaUser, FaSignOutAlt, FaSignInAlt } from "react-icons/fa";
+import {
+  FaHome,
+  FaUser,
+  FaSignOutAlt,
+  FaSignInAlt,
+  FaSearch,
+} from "react-icons/fa";
 import AuthContext from "context/AuthContext";
 import { useContext } from "react";
 import { getAuth, signOut } from "firebase/auth";
@@ -29,27 +35,38 @@ const FooterMenu = () => {
           type="button"
           aria-label="Home Button"
           onClick={() => navigate("/")}>
-          <FaHome /> Home
+          <FaHome />
+          <span>Home</span>
         </button>
         <button
           type="button"
           aria-label="Profile Button"
           onClick={() => navigate("/profile")}>
-          <FaUser /> Profile
+          <FaUser />
+          <span>Profile</span>
+        </button>
+        <button
+          type="button"
+          aria-label="Search Button"
+          onClick={() => navigate("/search")}>
+          <FaSearch />
+          <span>Search</span>
         </button>
         {user === null ? (
           <button
             type="button"
             aria-label="Login Button"
             onClick={() => navigate("/users/login")}>
-            <FaSignInAlt /> Login
+            <FaSignInAlt />
+            <span>Login</span>
           </button>
         ) : (
           <button
             type="button"
             aria-label="Logout Button"
             onClick={handleLogout}>
-            <FaSignOutAlt /> Logout
+            <FaSignOutAlt />
+            <span>Logout</span>
           </button>
         )}
       </div>
