@@ -200,6 +200,22 @@ a {
 
 // post layout
 .post {
+  &__header {
+    button {
+      margin: 12px 0;
+      border: none;
+
+      .back_icon {
+        width: 32px;
+        height: 32px;
+      }
+
+      :hover {
+        cursor: pointer;
+      }
+    }
+  }
+
   &__no-posts {
     padding: 16px;
 

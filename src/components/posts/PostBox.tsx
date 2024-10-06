@@ -1,8 +1,11 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaUserCircle, FaHeart, FaComment } from "react-icons/fa";
 import { PostProps } from "pages/home";
 import { useContext } from "react";
 import AuthContext from "context/AuthContext";
+import { doc, deleteDoc } from "firebase/firestore";
+import { db } from "firebaseApp";
+import { toast } from "react-toastify";
 
 type postBoxProps = {
   post: PostProps;
@@ -14,8 +17,20 @@ type postBoxProps = {
 // 즉, 타입을 지정할 때에 { post }: postBoxProps 이런식으로 설정하면 내가 받은 post props의 타입을 곧바로 명시하는 것임
 export const PostBox = ({ post }: postBoxProps) => {
   const { user } = useContext(AuthContext);
-  const handleDelete = () => {
-    console.log("게시글 삭제~");
+  const navigate = useNavigate();
+
+  const handleDelete = async () => {
+    try {
+      const confirm = window.confirm("해당 게시글을 삭제하시겠습니까?");
+      if (confirm) {
+        await deleteDoc(doc(db, "posts", post.id as string));
+        toast.success("게시글을 삭제하였습니다.");
+        navigate("/");
+      }
+    } catch (error) {
+      console.error(`게시글 삭제 실패 : ${error}`);
+      toast.error(`게시글 삭제 실패 : ${error}`);
+    }
   };
 
   return (
