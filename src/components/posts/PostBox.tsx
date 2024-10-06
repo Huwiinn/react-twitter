@@ -50,6 +50,13 @@ export const PostBox = ({ post }: postBoxProps) => {
           <div className="post_createAd">{post?.createdAt}</div>
         </div>
         <div className="post_box--content">{post?.content}</div>
+        <div className="post_form__hashtags-outputs">
+          {post?.hashtags?.map((tag, idx) => (
+            <span className="post_form__hashtags-tag" key={`${idx}-${tag}`}>
+              #{tag}
+            </span>
+          ))}
+        </div>
       </Link>
       <div className="post_box--footer">
         {/* post.uid === user.uid 일 때 */}

@@ -1,13 +1,16 @@
 import { FiImage } from "react-icons/fi";
 import { useContext, useState } from "react";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, updateDoc, doc } from "firebase/firestore";
 import { toast } from "react-toastify";
 import { db } from "firebaseApp";
 import AuthContext from "context/AuthContext";
 
 export const PostForm = () => {
   const [isContent, setIsContent] = useState<string>("");
+  const [hashtag, setHashtag] = useState<string>("");
+  const [tags, setTags] = useState<string[]>([]);
   const { user } = useContext(AuthContext);
+
   const handleFileUpload = () => {
     console.log("파일 업로드~");
   };
@@ -25,8 +28,11 @@ export const PostForm = () => {
         }),
         uid: user?.uid,
         email: user?.email,
+        hashtags: tags,
       });
 
+      setTags([]);
+      setHashtag("");
       setIsContent("");
 
       toast.success("게시글을 작성하였습니다.");
@@ -46,6 +52,30 @@ export const PostForm = () => {
     }
   };
 
+  const onChangeHashTag = (e: any) => {
+    setHashtag(e.target.value.trim());
+  };
+
+  const handleKeyUp = (e: any) => {
+    e.preventDefault();
+
+    if (e.keyCode === 32 && e.target.value.trim() !== "") {
+      // 태그를 생성한다
+      // 만약 같은 태그가 있다면 에러를 띄운다.
+      alert("스페이스바 눌렀네용?");
+      if (tags?.includes(e.target.value?.trim())) {
+        toast.error("깉은 태그가 있습니다.");
+      } else {
+        setTags((prev) => (prev?.length > 0 ? [...prev, hashtag] : [hashtag]));
+        setHashtag("");
+      }
+    }
+  };
+
+  const handleRemoveHashTag = (tag: string) => {
+    setTags(tags.filter((v) => v !== tag));
+  };
+
   return (
     <form className="post_form" onSubmit={onSubmit}>
       <textarea
@@ -57,6 +87,30 @@ export const PostForm = () => {
         onChange={onChange}
         value={isContent}
       />
+      {/* hash tag */}
+      <div className="post_form__hashtags">
+        <div className="post_form__hashtags-outputs">
+          {tags?.map((tag, idx) => (
+            <span
+              className="post_form__hashtags-tag"
+              key={`${idx}-${tag}`}
+              onClick={() => handleRemoveHashTag(tag)}>
+              #{tag}
+            </span>
+          ))}
+        </div>
+        <input
+          className="post_form__input"
+          name="hashtag"
+          id="hashtag"
+          placeholder="해시태그를 입력하고 스페이스바를 눌러주세요."
+          type="text"
+          maxLength={12}
+          onChange={onChangeHashTag}
+          onKeyUp={handleKeyUp}
+          value={hashtag}
+        />
+      </div>
       <div className="post_form--submit-area">
         <label htmlFor="file-input" className="post_form--file">
           <FiImage className="post_form--file-icon" />

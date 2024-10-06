@@ -22,6 +22,7 @@ export interface PostProps {
   likes?: string[];
   likeCount?: number;
   comments?: any;
+  hashtags?: string[];
 }
 
 const HomePage = () => {
