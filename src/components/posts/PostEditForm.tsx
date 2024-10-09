@@ -1,18 +1,29 @@
 import { FiImage } from "react-icons/fi";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
-import { db } from "firebaseApp";
+import { db, storage } from "firebaseApp";
 import { useNavigate, useParams } from "react-router-dom";
 import { PostProps } from "pages/home";
+import AuthContext from "context/AuthContext";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadString,
+} from "firebase/storage";
+import { v4 as uuidv4 } from "uuid";
+import PostHeader from "components/posts/PostHeader";
 
 export const PostEditForm = () => {
   const [isContent, setIsContent] = useState<string>("");
   const [post, setPost] = useState<PostProps | null>(null);
   const [hashtag, setHashtag] = useState<string>("");
+  const [imageFiles, setImageFiles] = useState<string[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const params = useParams();
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
 
   const getPost = useCallback(async () => {
     if (params.id) {
@@ -22,11 +33,41 @@ export const PostEditForm = () => {
       setPost({ ...(postSnap?.data() as PostProps), id: postRef.id });
       setIsContent(postSnap?.data()?.content);
       setTags(postSnap.data()?.hashtags);
+      setImageFiles(postSnap.data()?.imageUrl);
     }
   }, [params.id]);
 
-  const handleFileUpload = () => {
-    console.log("파일 업로드~");
+  const handleFileUpload = (e: any) => {
+    const {
+      target: { files },
+    } = e;
+
+    // FileList를 배열로 변환
+    const uploadFiles = Array.from(files);
+    console.log("uploadFiles : ", uploadFiles);
+
+    // 업로드된 파일들을 저장할 배열
+    const fileReaders: string[] = [];
+
+    // 파일을 하나씩 읽기
+    uploadFiles.forEach((file, index) => {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(file as Blob); // 각 파일을 개별적으로 처리
+
+      fileReader.onloadend = (event) => {
+        console.log("event : ", event);
+        const { result } = event.target as FileReader;
+
+        if (result) {
+          fileReaders.push(result as string); // 결과를 배열에 저장
+
+          // 모든 파일이 로드된 후에 상태를 업데이트
+          if (fileReaders.length === uploadFiles.length) {
+            setImageFiles(fileReaders);
+          }
+        }
+      };
+    });
   };
 
   const onSubmit = async (e: any) => {
@@ -34,14 +75,49 @@ export const PostEditForm = () => {
 
     try {
       if (post) {
+        // 새로운 사진이 업로드되면, 기존 사진을 지우고 새로운 사진 업로드
+        if (post?.imageUrl && post?.imageUrl.length >= 1) {
+          const deleteImgPromises = post?.imageUrl?.map(async (image) => {
+            const imgRef = ref(storage, image);
+
+            return await deleteObject(imgRef).catch((error) => {
+              console.error(error);
+            });
+          });
+
+          // 모든 이미지 삭제가 완료될 때까지 기다림
+          await Promise.all(deleteImgPromises);
+
+          await alert("이미지 제거 ~");
+        }
+
+        // 1. 이미지 업로드
+        const uploadPromises = imageFiles.map(async (image) => {
+          const key = `${user?.uid}/${uuidv4()}_img`;
+
+          // 여러장을 업로드 할 때에는 반복루프 내부에서 각각의 참조를 다시 생성해주어야 중복되지 않고 각 이미지가 업로드된다.
+          const storageRef = ref(storage, key);
+
+          // 이미지 업로드
+          const data = await uploadString(storageRef, image, "data_url");
+
+          // 업로드된 이미지의 다운로드 URL 가져오기
+          return getDownloadURL(data.ref);
+        });
+
+        // 모든 업로드 작업이 완료될 때까지 기다림
+        const imageUrls = await Promise.all(uploadPromises);
+        // 만약 사진이 아에 없다면 삭제
         const postRef = doc(db, "posts", post?.id);
 
         await updateDoc(postRef, {
           content: isContent,
           hashtags: tags,
+          imageUrl: imageUrls,
         });
       }
       setIsContent("");
+      setImageFiles([]);
       navigate(`/posts/${post?.id}`);
       toast.success("게시글을 수정하였습니다.");
     } catch (error) {
@@ -88,10 +164,13 @@ export const PostEditForm = () => {
     params.id && getPost();
   }, [getPost]);
 
-  console.log("post : ", post);
+  const handleDeleteImage = () => {
+    setImageFiles([]);
+  };
 
   return (
     <form className="post_form" onSubmit={onSubmit}>
+      <PostHeader />
       <textarea
         className="post_form--textarea"
         required
@@ -137,7 +216,22 @@ export const PostEditForm = () => {
           onChange={handleFileUpload}
           className="hidden"
           aria-label="이미지 업로드"
+          multiple
         />
+
+        {imageFiles.length >= 1 && (
+          <div className="post_form__attachment">
+            {imageFiles?.map((image) => (
+              <img src={image} alt="첨부 이미지" width={100} height={100} />
+            ))}
+            <button
+              className="post_form__clear-btn"
+              type="button"
+              onClick={handleDeleteImage}>
+              Clear
+            </button>
+          </div>
+        )}
         <input type="submit" value="수정" className="post_form--submit-btn" />
       </div>
     </form>

@@ -4,18 +4,12 @@ import { collection, addDoc, updateDoc, doc } from "firebase/firestore";
 import { toast } from "react-toastify";
 import { db, storage } from "firebaseApp";
 import AuthContext from "context/AuthContext";
-import {
-  uploadString,
-  ref,
-  getDownloadURL,
-  uploadBytes,
-} from "firebase/storage";
+import { uploadString, ref, getDownloadURL } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
 
 export const PostForm = () => {
   const [isContent, setIsContent] = useState<string>("");
   const [hashtag, setHashtag] = useState<string>("");
-  // const [imageFile, setImageFile] = useState<string | null>(null);
   const [imageFiles, setImageFiles] = useState<string[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -233,7 +227,7 @@ export const PostForm = () => {
           type="submit"
           value="Tweet"
           className="post_form--submit-btn"
-          disabled={isSubmitting}
+          // disabled={isSubmitting}
         />
       </div>
     </form>
