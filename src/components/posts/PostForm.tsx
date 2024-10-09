@@ -2,23 +2,55 @@ import { FiImage } from "react-icons/fi";
 import { useContext, useState } from "react";
 import { collection, addDoc, updateDoc, doc } from "firebase/firestore";
 import { toast } from "react-toastify";
-import { db } from "firebaseApp";
+import { db, storage } from "firebaseApp";
 import AuthContext from "context/AuthContext";
+import { uploadString, ref, getDownloadURL } from "firebase/storage";
+import { v4 as uuidv4 } from "uuid";
 
 export const PostForm = () => {
   const [isContent, setIsContent] = useState<string>("");
   const [hashtag, setHashtag] = useState<string>("");
+  const [imageFile, setImageFile] = useState<string | null>(null);
   const [tags, setTags] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const { user } = useContext(AuthContext);
 
-  const handleFileUpload = () => {
-    console.log("파일 업로드~");
+  const handleFileUpload = (e: any) => {
+    const {
+      target: { files },
+    } = e;
+
+    const file = files?.[0];
+    const fileReader = new FileReader();
+    fileReader?.readAsDataURL(file);
+
+    fileReader.onloadend = (e: any) => {
+      const { result } = e?.currentTarget;
+      console.log({ result });
+
+      setImageFile(result);
+    };
   };
 
+  console.log({ imageFile });
+
   const onSubmit = async (e: any) => {
+    setIsSubmitting(true);
     e.preventDefault();
 
+    const key = `${user?.uid}/${uuidv4()}_img`;
+    const storageRef = ref(storage, key);
+
     try {
+      // 1. 이미지 먼저 업로드
+      let imageUrl = "";
+      if (imageFile) {
+        const data = await uploadString(storageRef, imageFile, "data_url");
+        console.log({ data });
+        imageUrl = await getDownloadURL(data?.ref);
+      }
+
+      // 2. 업로드된 이미지의 다운로드 url 업데이트
       await addDoc(collection(db, "posts"), {
         content: isContent,
         createdAt: new Date()?.toLocaleDateString("ko", {
@@ -29,16 +61,21 @@ export const PostForm = () => {
         uid: user?.uid,
         email: user?.email,
         hashtags: tags,
+        imageUrl: imageUrl,
       });
 
       setTags([]);
       setHashtag("");
       setIsContent("");
+      setImageFile(null);
 
       toast.success("게시글을 작성하였습니다.");
+
+      setIsSubmitting(false);
     } catch (error) {
       console.error(`게시글 작성 실패 : ${error}`);
       toast.error("게시글 작성에 실패했습니다.");
+      setIsSubmitting(false);
     }
   };
 
@@ -74,6 +111,10 @@ export const PostForm = () => {
 
   const handleRemoveHashTag = (tag: string) => {
     setTags(tags.filter((v) => v !== tag));
+  };
+
+  const handleDeleteImage = () => {
+    setImageFile(null);
   };
 
   return (
@@ -112,19 +153,38 @@ export const PostForm = () => {
         />
       </div>
       <div className="post_form--submit-area">
-        <label htmlFor="file-input" className="post_form--file">
-          <FiImage className="post_form--file-icon" />
-        </label>
+        <div className="post_form--image-area">
+          <label htmlFor="file-input" className="post_form--file">
+            <FiImage className="post_form--file-icon" />
+          </label>
+          <input
+            type="file"
+            id="file-input"
+            name="file-input"
+            accept="image/*"
+            onChange={handleFileUpload}
+            className="hidden"
+            aria-label="이미지 업로드"
+          />
+
+          {imageFile && (
+            <div className="post_form__attachment">
+              <img src={imageFile} alt="첨부 이미지" width={100} height={100} />
+              <button
+                className="post_form__clear-btn"
+                type="button"
+                onClick={handleDeleteImage}>
+                Clear
+              </button>
+            </div>
+          )}
+        </div>
         <input
-          type="file"
-          id="file-input"
-          name="file-input"
-          accept="image/*"
-          onChange={handleFileUpload}
-          className="hidden"
-          aria-label="이미지 업로드"
+          type="submit"
+          value="Tweet"
+          className="post_form--submit-btn"
+          disabled={isSubmitting}
         />
-        <input type="submit" value="Tweet" className="post_form--submit-btn" />
       </div>
     </form>
   );

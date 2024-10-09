@@ -170,6 +170,11 @@ a {
 }
 
 .post_form {
+  &--image-area {
+    display: flex;
+    align-items: center;
+  }
+
   &__input {
     font-family: $font;
     padding: 8px;
