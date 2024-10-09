@@ -51,17 +51,19 @@ export const PostBox = ({ post }: postBoxProps) => {
           <div className="post_email">{post?.email}</div>
           <div className="post_createAd">{post?.createdAt}</div>
         </div>
-        {post?.imageUrl && (
-          <div className="post__image-div">
-            <img
-              src={post?.imageUrl}
-              width={550}
-              height={350}
-              alt="포스트 업로드 이미지"
-              className="post__image"
-            />
-          </div>
-        )}
+        {post?.imageUrl &&
+          post?.imageUrl?.length > 1 &&
+          post?.imageUrl?.map((image) => (
+            <div className="post__image-div">
+              <img
+                src={image}
+                width={550}
+                height={350}
+                alt="포스트 업로드 이미지"
+                className="post__image"
+              />
+            </div>
+          ))}
         <div className="post_box--content">{post?.content}</div>
         <div className="post_form__hashtags-outputs">
           {post?.hashtags?.map((tag, idx) => (

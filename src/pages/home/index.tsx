@@ -23,7 +23,7 @@ export interface PostProps {
   likeCount?: number;
   comments?: any;
   hashtags?: string[];
-  imageUrl?: string;
+  imageUrl?: string[];
 }
 
 const HomePage = () => {
