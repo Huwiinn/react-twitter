@@ -4,8 +4,9 @@ import { PostProps } from "pages/home";
 import { useContext } from "react";
 import AuthContext from "context/AuthContext";
 import { doc, deleteDoc } from "firebase/firestore";
-import { db } from "firebaseApp";
+import { db, storage } from "firebaseApp";
 import { toast } from "react-toastify";
+import { ref, deleteObject } from "firebase/storage";
 
 type postBoxProps = {
   post: PostProps;
@@ -18,11 +19,31 @@ type postBoxProps = {
 export const PostBox = ({ post }: postBoxProps) => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
+  // const imgRef = post?.imageUrl?.map((image) => {
+  //   return ref(storage, image);
+  // });
 
   const handleDelete = async () => {
     try {
       const confirm = window.confirm("해당 게시글을 삭제하시겠습니까?");
+
       if (confirm) {
+        // 스토리지에서 이미지 삭제
+        if (post?.imageUrl && post?.imageUrl.length >= 1) {
+          const deleteImgPromises = post?.imageUrl?.map(async (image) => {
+            const imgRef = ref(storage, image);
+
+            return await deleteObject(imgRef).catch((error) => {
+              console.error(error);
+            });
+          });
+
+          // 모든 이미지 삭제가 완료될 때까지 기다림
+          await Promise.all(deleteImgPromises);
+
+          await alert("이미지 제거 ~");
+        }
+
         await deleteDoc(doc(db, "posts", post.id as string));
         toast.success("게시글을 삭제하였습니다.");
         navigate("/");
@@ -52,7 +73,7 @@ export const PostBox = ({ post }: postBoxProps) => {
           <div className="post_createAd">{post?.createdAt}</div>
         </div>
         {post?.imageUrl &&
-          post?.imageUrl?.length > 1 &&
+          post?.imageUrl?.length >= 1 &&
           post?.imageUrl?.map((image) => (
             <div className="post__image-div">
               <img
