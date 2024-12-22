@@ -3,7 +3,6 @@ import PostHeader from "../../../components/posts/PostHeader";
 import { FiImage } from "react-icons/fi";
 import AuthContext from "context/AuthContext";
 import {
-  getStorage,
   ref,
   deleteObject,
   uploadString,
@@ -20,6 +19,8 @@ const ProfileEditPage = () => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  const STORAGE_DOWNLOAD_URL_STR = "https://firebasestorage.googleapis.com";
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {
@@ -58,13 +59,18 @@ const ProfileEditPage = () => {
     let newImageUrl: string | null = null;
 
     try {
-      // 기존 이미지 삭제
-      // if (user?.photoURL) {
-      //   const imageRef = ref(storage, user?.photoURL);
-      //   await deleteObject(imageRef).catch((error) => {
-      //     console.log("기존 이미지 삭제 에러 : ", error);
-      //   });
-      // }
+      // 기존 유저 이미지가 firebase storage 스토리지 이미지 삭제
+      if (
+        user?.photoURL &&
+        user?.photoURL?.includes(STORAGE_DOWNLOAD_URL_STR)
+      ) {
+        const imageRef = ref(storage, user?.photoURL);
+        if (imageRef) {
+          await deleteObject(imageRef).catch((error) => {
+            console.log("기존 이미지 삭제 에러 : ", error);
+          });
+        }
+      }
       // 이미지 업로드
       if (imageUrl) {
         const data = await uploadString(storageRef, imageUrl, "data_url");
@@ -102,8 +108,8 @@ const ProfileEditPage = () => {
   return (
     <div className="post">
       <PostHeader />
-      <form className="post-form" onSubmit={onSubmit}>
-        <div className="post-form__profile">
+      <form className="post_form" onSubmit={onSubmit}>
+        <div className="post_form__profile">
           <input
             type="text"
             name="displayName"
@@ -113,7 +119,7 @@ const ProfileEditPage = () => {
             value={displayName}
           />
           {imageUrl && (
-            <div className="post-form__attachment">
+            <div className="post_form__attachment">
               <img
                 src={imageUrl}
                 alt="수정하려는 이미지"
@@ -145,12 +151,8 @@ const ProfileEditPage = () => {
               className="hidden"
               onChange={handleFileUpload}
             />
+            <input type="submit" value="프로필 수정" className="profile__btn" />
           </div>
-          <input
-            type="submit"
-            value="프로필 수정"
-            className="post_form--submit-btn"
-          />
         </div>
       </form>
     </div>
