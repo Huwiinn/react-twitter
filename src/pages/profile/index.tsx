@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useRef } from "react";
 import AuthContext from "context/AuthContext";
 import { PostProps } from "../home/index";
 import { PostBox } from "../../components/posts/PostBox";
@@ -12,30 +12,51 @@ import {
 import { db } from "firebaseApp";
 import { useNavigate } from "react-router-dom";
 
+type ActiveTabType = "my" | "like";
 const PROFILE_DEFAULT_URL = "/logo192.png";
 
 const ProfilePage = () => {
-  const [posts, setPosts] = useState<PostProps[]>([]);
+  const [activeTab, setActiveTab] = useState<ActiveTabType>("my");
+  const [myPosts, setMyPosts] = useState<PostProps[]>([]);
+  const [likePosts, setLikePosts] = useState<PostProps[]>([]);
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
+
+  const tabRef = useRef(null);
 
   useEffect(() => {
     if (user) {
       let postsRef = collection(db, "posts");
-      let postsQuery = query(
+      const myPostsQuery = query(
         postsRef,
         where("uid", "==", user.uid),
         orderBy("createdAt", "desc")
       );
 
-      onSnapshot(postsQuery, (snapShot) => {
+      const likePostsQuery = query(
+        postsRef,
+        where("likes", "array-contains", user.uid),
+        orderBy("createdAt", "desc")
+      );
+
+      onSnapshot(myPostsQuery, (snapShot) => {
         let dataObj = snapShot.docs.map((doc) => ({
           ...doc.data(),
           id: doc?.id,
         }));
 
         console.log("dataObj : ", dataObj);
-        setPosts(dataObj as PostProps[]);
+        setMyPosts(dataObj as PostProps[]);
+      });
+
+      onSnapshot(likePostsQuery, (snapShot) => {
+        let dataObj = snapShot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc?.id,
+        }));
+
+        console.log("dataObj : ", dataObj);
+        setLikePosts(dataObj as PostProps[]);
       });
     }
   }, [user]);
@@ -67,21 +88,71 @@ const ProfilePage = () => {
           <div className="profile__email">{`${user?.email}`}</div>
         </div>
         <div className="home__tabs">
-          <div className="home__tab home__tab--active">For U</div>
-          <div className="home__tab">Likes</div>
+          <div
+            className={`home__tab ${activeTab === "my" && "home__tab--active"}`}
+            onClick={() => setActiveTab("my")}
+          >
+            For U
+          </div>
+          <div
+            className={`home__tab ${
+              activeTab === "like" && "home__tab--active"
+            }`}
+            onClick={() => setActiveTab("like")}
+          >
+            Likes
+          </div>
         </div>
       </div>
-      <div className="post">
-        {posts?.length > 0 ? (
-          posts.map((post) => <PostBox post={post} key={post.id} />)
-        ) : (
-          <div className="post__no-posts">
-            <p className="post__text">게시글이 없습니다.</p>
-          </div>
-        )}
-      </div>
+      {activeTab === "my" && (
+        <div className="post">
+          {myPosts?.length > 0 ? (
+            myPosts.map((post) => <PostBox post={post} key={post.id} />)
+          ) : (
+            <div className="post__no-posts">
+              <p className="post__text">게시글이 없습니다.</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === "like" && (
+        <div className="post">
+          {likePosts?.length > 0 ? (
+            likePosts.map((post) => <PostBox post={post} key={post.id} />)
+          ) : (
+            <div className="post__no-posts">
+              <p className="post__text">게시글이 없습니다.</p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
 
 export default ProfilePage;
+
+// ----------------------------------
+
+// import { useSyncExternalStore } from "react";
+
+// function subscribe(callback : (this: Window, ev: UIEvent) => void) {
+//   window.addEventListener('resize', callback);
+//   return () => {
+//     window.removeEventListener('resize', callback);
+//   }
+// }
+
+// function useWindowWidth() {
+//   return useSyncExternalStore(
+//     subscribe,
+//     () => window.innerWidth,
+//     () => 0
+//   );
+// }
+
+// export default function App() {
+//   const windowSize = useWindowWidth();
+//   return <>{windowSize}</>
+// }

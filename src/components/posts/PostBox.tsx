@@ -1,9 +1,16 @@
 import { Link, useNavigate } from "react-router-dom";
 import { FaUserCircle, FaHeart, FaComment } from "react-icons/fa";
+import { AiOutlineHeart } from "react-icons/ai";
 import { PostProps } from "pages/home";
 import { useContext } from "react";
 import AuthContext from "context/AuthContext";
-import { doc, deleteDoc } from "firebase/firestore";
+import {
+  doc,
+  deleteDoc,
+  updateDoc,
+  arrayRemove,
+  arrayUnion,
+} from "firebase/firestore";
 import { db, storage } from "firebaseApp";
 import { toast } from "react-toastify";
 import { ref, deleteObject } from "firebase/storage";
@@ -54,7 +61,25 @@ export const PostBox = ({ post }: postBoxProps) => {
     }
   };
 
-  console.log({ post });
+  // console.log({ post });
+
+  const toggleLike = async () => {
+    const postRef = doc(db, "posts", post.id);
+
+    if (user?.uid && post?.likes?.includes(user?.uid)) {
+      // 좋아요를 이미 물렀을 때 취소
+      await updateDoc(postRef, {
+        likes: arrayRemove(user?.uid),
+        likeCount: post.likeCount ? post.likeCount - 1 : 0,
+      });
+    } else {
+      // 새롭게 좋아요를 했을 경우
+      await updateDoc(postRef, {
+        likes: arrayUnion(user?.uid),
+        likeCount: post.likeCount ? post.likeCount + 1 : 1,
+      });
+    }
+  };
 
   return (
     <div className="post_box" key={post.id}>
@@ -101,7 +126,8 @@ export const PostBox = ({ post }: postBoxProps) => {
             <button
               type="button"
               className="post_delete"
-              onClick={handleDelete}>
+              onClick={handleDelete}
+            >
               Delete
             </button>
             <button type="button" className="post_edit">
@@ -110,8 +136,12 @@ export const PostBox = ({ post }: postBoxProps) => {
           </>
         )}
         <>
-          <button type="button" className="post_likes">
-            <FaHeart />
+          <button type="button" className="post_likes" onClick={toggleLike}>
+            {user && post?.likes?.includes(user.uid) ? (
+              <FaHeart />
+            ) : (
+              <AiOutlineHeart />
+            )}
             {post?.likeCount || 0}
           </button>
           <button type="button" className="post_comments">
