@@ -146,7 +146,7 @@ export const PostBox = ({ post }: postBoxProps) => {
           </button>
           <button type="button" className="post_comments">
             <FaComment />
-            {post?.comments?.length || 0}
+            {post?.comment?.length || 0}
           </button>
         </>
       </div>
