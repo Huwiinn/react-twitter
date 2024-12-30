@@ -309,6 +309,41 @@ a {
 
 // post layout
 .post {
+  &_flex {
+    display: flex;
+    gap: 8px;
+  }
+
+  &_flex--between {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &_following-btn {
+    @extend .button;
+    background-color: $activeBorder;
+    color: $white;
+
+    &:hover,
+    &:focus {
+      background-color: $white;
+      color: $activeBorder;
+    }
+  }
+
+  &_follow-btn {
+    @extend .button;
+    background-color: $white;
+    color: $activeBorder;
+
+    &:hover,
+    &:focus {
+      background-color: $activeBorder;
+      color: $white;
+    }
+  }
+
   &__header {
     button {
       margin: 12px 0;
