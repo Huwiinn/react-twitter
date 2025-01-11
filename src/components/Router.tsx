@@ -26,7 +26,7 @@ const Router = ({ isAuth }: RouterProps) => {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/profile/edit" element={<ProfileEditPage />} />
           <Route path="/search" element={<SearchPage />} />
-          <Route path="/notification" element={<NotificationPage />} />
+          <Route path="/notifications" element={<NotificationPage />} />
           <Route path="*" element={<Navigate replace to="/" />} />
         </>
       ) : (

@@ -1,7 +1,9 @@
 import AuthContext from "context/AuthContext";
 import {
+  addDoc,
   arrayRemove,
   arrayUnion,
+  collection,
   doc,
   onSnapshot,
   setDoc,
@@ -42,6 +44,18 @@ const FollowingBox = ({ post }: FollowingProps) => {
           users: arrayUnion({ id: user?.uid }, { merge: true }),
         });
 
+        // 팔로잉 알림 생성
+        await addDoc(collection(db, "notifications"), {
+          createdAt: new Date()?.toLocaleDateString("ko", {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+          }),
+          uid: post?.uid,
+          isRead: false,
+          url: `#`,
+          content: `${user.email || user.displayName}님이 팔로우 했습니다.`,
+        });
         toast.success("팔로우 성공!");
       }
     } catch (e) {

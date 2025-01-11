@@ -26,6 +26,7 @@ export interface PostProps {
   comment?: any;
   hashtags?: string[];
   imageUrl?: string[];
+  displayName?: string;
 }
 
 type TabType = "all" | "following";
@@ -37,14 +38,14 @@ const HomePage = () => {
   const [activeTab, setActiveTab] = useState<TabType>("all");
   const { user } = useContext(AuthContext);
 
-  console.log(followingIds);
+  // console.log(followingIds);
 
   // 실시간 동기화로 user의 팔로잉 id 배열 가져오기
   const getFollowingIds = useCallback(async () => {
     if (user?.uid) {
       const ref = doc(db, "following", user?.uid);
       onSnapshot(ref, (doc) => {
-        setFollowingIds([]);
+        setFollowingIds([""]);
         doc?.data()?.users.map((user: UserProps) => {
           if (user?.id) {
             setFollowingIds((prev) => [...prev, user.id]);

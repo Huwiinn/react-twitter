@@ -81,7 +81,8 @@ export const PostBox = ({ post }: postBoxProps) => {
       });
     }
   };
-
+  console.log("user : ", user);
+  console.log("post : ", post);
   return (
     <div className="post_box" key={post.id}>
       <div className="post_box--profile">
@@ -96,7 +97,9 @@ export const PostBox = ({ post }: postBoxProps) => {
         )}
         <div className="post_flex--between">
           <div className="post_flex">
-            <div className="post_email">{post?.email}</div>
+            <div className="post_email">
+              {post?.displayName ? post.displayName : post.email}
+            </div>
             <div className="post_createAd">{post?.createdAt}</div>
           </div>
           <FollowingBox post={post} />

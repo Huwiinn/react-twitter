@@ -6,6 +6,7 @@ import {
   FaSignInAlt,
   FaSearch,
 } from "react-icons/fa";
+import { HiMiniBellAlert } from "react-icons/hi2";
 import AuthContext from "context/AuthContext";
 import { useContext } from "react";
 import { getAuth, signOut } from "firebase/auth";
@@ -34,29 +35,41 @@ const FooterMenu = () => {
         <button
           type="button"
           aria-label="Home Button"
-          onClick={() => navigate("/")}>
+          onClick={() => navigate("/")}
+        >
           <FaHome />
           <span>Home</span>
         </button>
         <button
           type="button"
           aria-label="Profile Button"
-          onClick={() => navigate("/profile")}>
+          onClick={() => navigate("/profile")}
+        >
           <FaUser />
           <span>Profile</span>
         </button>
         <button
           type="button"
           aria-label="Search Button"
-          onClick={() => navigate("/search")}>
+          onClick={() => navigate("/search")}
+        >
           <FaSearch />
           <span>Search</span>
+        </button>
+        <button
+          type="button"
+          aria-label="Search Button"
+          onClick={() => navigate("/notifications")}
+        >
+          <HiMiniBellAlert />
+          <span>Notifications</span>
         </button>
         {user === null ? (
           <button
             type="button"
             aria-label="Login Button"
-            onClick={() => navigate("/users/login")}>
+            onClick={() => navigate("/users/login")}
+          >
             <FaSignInAlt />
             <span>Login</span>
           </button>
@@ -64,7 +77,8 @@ const FooterMenu = () => {
           <button
             type="button"
             aria-label="Logout Button"
-            onClick={handleLogout}>
+            onClick={handleLogout}
+          >
             <FaSignOutAlt />
             <span>Logout</span>
           </button>
