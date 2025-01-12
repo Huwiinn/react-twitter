@@ -13,6 +13,8 @@ import {
 import AuthContext from "context/AuthContext";
 import { db } from "firebaseApp";
 import { UserProps } from "components/following/FollowingBox";
+import { useRecoilState } from "recoil";
+import { languageState } from "atom";
 
 export interface PostProps {
   id: string;
@@ -37,6 +39,8 @@ const HomePage = () => {
   const [followingIds, setFollowingIds] = useState<string[]>([""]);
   const [activeTab, setActiveTab] = useState<TabType>("all");
   const { user } = useContext(AuthContext);
+
+  const [language, setLanguage] = useRecoilState(languageState);
 
   // console.log(followingIds);
 
@@ -89,10 +93,23 @@ const HomePage = () => {
     }
   }, [user, followingIds]);
 
+  const handleChangeLanguage = () => {
+    language === "ko" ? setLanguage("en") : setLanguage("ko");
+    localStorage.setItem("language", language === "ko" ? "en" : "ko");
+  };
+
   return (
     <div className="home">
       <div className="home__top">
-        <div className="home__title">Home</div>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <div className="home__title">Home</div>
+          <button
+            style={{ border: "none", cursor: "pointer" }}
+            onClick={handleChangeLanguage}
+          >
+            Language: {language}
+          </button>
+        </div>
         <div className="home__tabs">
           <div
             className={`home__tab ${

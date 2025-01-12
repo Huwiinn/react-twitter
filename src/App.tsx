@@ -6,6 +6,7 @@ import Layout from "components/Layout";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Loader from "./components/loader/Loader";
+import { RecoilRoot } from "recoil";
 
 function App() {
   const auth = getAuth(app);
@@ -23,15 +24,17 @@ function App() {
   }, [auth]);
 
   return (
-    <Layout>
-      <ToastContainer
-        theme="dark"
-        autoClose={1000}
-        hideProgressBar
-        newestOnTop
-      />
-      {init ? <Router isAuth={isAuth} /> : <Loader />}
-    </Layout>
+    <RecoilRoot>
+      <Layout>
+        <ToastContainer
+          theme="dark"
+          autoClose={1000}
+          hideProgressBar
+          newestOnTop
+        />
+        {init ? <Router isAuth={isAuth} /> : <Loader />}
+      </Layout>
+    </RecoilRoot>
   );
 }
 
