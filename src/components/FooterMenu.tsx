@@ -12,11 +12,14 @@ import { useContext } from "react";
 import { getAuth, signOut } from "firebase/auth";
 import { app } from "firebaseApp";
 import { toast } from "react-toastify";
+import useTransition from "hooks/useTranslation";
 
 const FooterMenu = () => {
-  const navigate = useNavigate();
   const { user } = useContext(AuthContext);
-  console.log("user : ", user);
+  const navigate = useNavigate();
+  const t = useTransition();
+
+  // console.log("user : ", user);
 
   const handleLogout = async () => {
     const auth = getAuth(app);
@@ -38,7 +41,7 @@ const FooterMenu = () => {
           onClick={() => navigate("/")}
         >
           <FaHome />
-          <span>Home</span>
+          <span>{t("MENU_HOME")}</span>
         </button>
         <button
           type="button"
@@ -46,7 +49,7 @@ const FooterMenu = () => {
           onClick={() => navigate("/profile")}
         >
           <FaUser />
-          <span>Profile</span>
+          <span>{t("MENU_PROFILE")}</span>
         </button>
         <button
           type="button"
@@ -54,7 +57,7 @@ const FooterMenu = () => {
           onClick={() => navigate("/search")}
         >
           <FaSearch />
-          <span>Search</span>
+          <span>{t("MENU_SEARCH")}</span>
         </button>
         <button
           type="button"
@@ -62,7 +65,7 @@ const FooterMenu = () => {
           onClick={() => navigate("/notifications")}
         >
           <HiMiniBellAlert />
-          <span>Notifications</span>
+          <span>{t("MENU_NOTIFICATIONS")}</span>
         </button>
         {user === null ? (
           <button
@@ -80,7 +83,7 @@ const FooterMenu = () => {
             onClick={handleLogout}
           >
             <FaSignOutAlt />
-            <span>Logout</span>
+            <span>{t("MENU_LOGOUT")}</span>
           </button>
         )}
       </div>
