@@ -41,7 +41,7 @@ const FooterMenu = () => {
           onClick={() => navigate("/")}
         >
           <FaHome />
-          <span>{t("MENU_HOME")}</span>
+          <span className="footer__grid--text">{t("MENU_HOME")}</span>
         </button>
         <button
           type="button"
@@ -49,7 +49,7 @@ const FooterMenu = () => {
           onClick={() => navigate("/profile")}
         >
           <FaUser />
-          <span>{t("MENU_PROFILE")}</span>
+          <span className="footer__grid--text">{t("MENU_PROFILE")}</span>
         </button>
         <button
           type="button"
@@ -57,7 +57,7 @@ const FooterMenu = () => {
           onClick={() => navigate("/search")}
         >
           <FaSearch />
-          <span>{t("MENU_SEARCH")}</span>
+          <span className="footer__grid--text">{t("MENU_SEARCH")}</span>
         </button>
         <button
           type="button"
@@ -65,7 +65,7 @@ const FooterMenu = () => {
           onClick={() => navigate("/notifications")}
         >
           <HiMiniBellAlert />
-          <span>{t("MENU_NOTIFICATIONS")}</span>
+          <span className="footer__grid--text">{t("MENU_NOTIFICATIONS")}</span>
         </button>
         {user === null ? (
           <button
@@ -74,7 +74,7 @@ const FooterMenu = () => {
             onClick={() => navigate("/users/login")}
           >
             <FaSignInAlt />
-            <span>Login</span>
+            <span className="footer__grid--text">Login</span>
           </button>
         ) : (
           <button
@@ -83,7 +83,7 @@ const FooterMenu = () => {
             onClick={handleLogout}
           >
             <FaSignOutAlt />
-            <span>{t("MENU_LOGOUT")}</span>
+            <span className="footer__grid--text">{t("MENU_LOGOUT")}</span>
           </button>
         )}
       </div>
